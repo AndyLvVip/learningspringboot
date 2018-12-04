@@ -1,6 +1,7 @@
 package aspire.demo.learningspringboot.image;
 
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Mono;
 
 /**
  * Created by andy.lv
@@ -8,4 +9,5 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
  */
 public interface ImageRepository extends ReactiveCrudRepository<Image, String> {
 
+    public Mono<Image> findByName();
 }

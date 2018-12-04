@@ -7,6 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
 
@@ -54,4 +55,15 @@ public class ImageService {
         }).then();
     }
 
+    public Mono<Void> deleteImage(String filename) {
+        Mono<Void> deleteImageAction = imageRepository.findByName().flatMap(imageRepository::delete);
+        Mono<Void> deleteFileAction = Mono.fromRunnable(() -> {
+            try {
+                Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return Mono.when(deleteImageAction, deleteFileAction).then();
+    }
 }

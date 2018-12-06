@@ -2,6 +2,7 @@ package aspire.demo.learningspringboot.image;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -94,5 +95,8 @@ public class ImageService {
                 .then()
                 .log("deleteImage-done")
                 ;
+    }
+    public Mono<Resource> findOneImage(String filename) {
+        return Mono.fromSupplier(() -> resourceLoader.getResource("file:" + UPLOAD_ROOT + "/" + filename));
     }
 }

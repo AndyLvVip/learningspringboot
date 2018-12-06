@@ -5,3 +5,10 @@ logging:
   level:
     aspire:
       demo: debug
+
+    org:
+      springframework:
+        data: trace
+    reactor:
+      core: trace
+      util: trace

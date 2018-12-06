@@ -51,19 +51,32 @@ public class ImageService {
                     .log("createImage-newfile")
                     .flatMap(destFile -> file.transferTo(destFile))
                     .log("createImage-copy");
-            return Mono.when(saveDatabaseImage, copyFile);
-        }).then();
+            return Mono.when(saveDatabaseImage, copyFile)
+                    .log("createImage-when")
+                    ;
+        }).then().log("createImage-done");
     }
 
     public Mono<Void> deleteImage(String filename) {
-        Mono<Void> deleteImageAction = imageRepository.findByName().flatMap(imageRepository::delete);
-        Mono<Void> deleteFileAction = Mono.fromRunnable(() -> {
+        Mono<Void> deleteImageAction = imageRepository
+                .findByName()
+                .log("deleteImage-find")
+                .flatMap(imageRepository::delete)
+                .log("deleteImage-record")
+                ;
+        Mono<Object> deleteFileAction = Mono.fromRunnable(() -> {
             try {
                 Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        });
-        return Mono.when(deleteImageAction, deleteFileAction).then();
+        })
+                .log("deleteImage-file")
+                ;
+        return Mono.when(deleteImageAction, deleteFileAction)
+                .log("deleteImage-when")
+                .then()
+                .log("deleteImage-done")
+                ;
     }
 }

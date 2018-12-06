@@ -1,11 +1,16 @@
 package aspire.demo.learningspringboot.image;
 
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.FileSystemUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -31,6 +36,17 @@ public class ImageService {
 
     public Flux<Image> findAllImages() {
         return imageRepository.findAll();
+    }
+
+    @Bean
+    public CommandLineRunner setUp() {
+        return args -> {
+            FileSystemUtils.deleteRecursively(Paths.get(UPLOAD_ROOT));
+            Files.createDirectory(Paths.get(UPLOAD_ROOT));
+            FileCopyUtils.copy("learning-spring-boot-cover.jpg", new FileWriter(UPLOAD_ROOT + "/learning-spring-boot-cover.jpg"));
+            FileCopyUtils.copy("learning-spring-boot-2nd-edition-cover.jpg", new FileWriter(UPLOAD_ROOT + "/learning-spring-boot-2nd-edition-cover.jpg"));
+            FileCopyUtils.copy("bazinga.png", new FileWriter(UPLOAD_ROOT + "/bazinga.png"));
+        };
     }
 
     public Mono<Void> createImage(Flux<FilePart> files) {

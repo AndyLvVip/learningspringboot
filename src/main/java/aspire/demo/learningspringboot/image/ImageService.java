@@ -36,7 +36,8 @@ public class ImageService {
     }
 
     public Flux<Image> findAllImages() {
-        return imageRepository.findAll();
+        return imageRepository.findAll()
+                .log("findAll");
     }
 
     @Bean
@@ -51,12 +52,16 @@ public class ImageService {
     }
 
     public Mono<Void> createImage(Flux<FilePart> files) {
-        return files.flatMap(file -> {
-            Mono<Image> saveDatabaseImage = imageRepository.save(new Image(UUID.randomUUID().toString(), file.filename()));
+        return files
+                .log("createImage-files")
+                .flatMap(file -> {
+            Mono<Image> saveDatabaseImage = imageRepository.save(new Image(UUID.randomUUID().toString(), file.filename()))
+                    .log("createImage-save")
+                    ;
 
             Mono<Void> copyFile = Mono.just(
                     Paths.get(UPLOAD_ROOT, file.filename()).toFile()
-            ).log("createImage-picktarget")
+            ).log("createImage-lockTarget")
                     .map(destFile -> {
                         try {
                             destFile.createNewFile();

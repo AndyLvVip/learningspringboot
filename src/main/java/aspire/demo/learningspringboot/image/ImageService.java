@@ -76,7 +76,7 @@ public class ImageService {
 
     public Mono<Void> deleteImage(String filename) {
         Mono<Void> deleteImageAction = imageRepository
-                .findByName()
+                .findByName(filename)
                 .log("deleteImage-find")
                 .flatMap(imageRepository::delete)
                 .log("deleteImage-record")

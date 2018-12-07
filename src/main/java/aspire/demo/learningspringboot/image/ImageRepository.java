@@ -9,5 +9,5 @@ import reactor.core.publisher.Mono;
  */
 public interface ImageRepository extends ReactiveCrudRepository<Image, String> {
 
-    Mono<Image> findByName();
+    Mono<Image> findByName(String name);
 }

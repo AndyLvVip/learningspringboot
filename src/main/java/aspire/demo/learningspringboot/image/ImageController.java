@@ -19,6 +19,8 @@ import java.io.IOException;
 @Controller
 public class ImageController {
 
+    private static final String FILE_NAME = "{filename:.+}";
+
     private ImageService imageService;
 
     public ImageController(ImageService imageService) {
@@ -32,12 +34,14 @@ public class ImageController {
     }
 
     @PostMapping("/images")
-    public Mono<Void> createImage(@RequestBody Flux<FilePart> files) {
-        return imageService.createImage(files);
+    public Mono<String> createImage(@RequestPart(name = "file") Flux<FilePart> files) {
+        return imageService.createImage(files)
+                .then(Mono.just("redirect:/"))
+                ;
     }
 
 
-    @GetMapping(value = "/images/{filename:.+}/raw", produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value = "/images/" + FILE_NAME + "/raw", produces = MediaType.IMAGE_JPEG_VALUE)
     @ResponseBody
     public Mono<ResponseEntity<?>> oneRawImage(@PathVariable String filename) {
         return imageService.findOneImage(filename).map(resource -> {
@@ -49,5 +53,12 @@ public class ImageController {
                         .body("Couldn't find " + filename + " => " + e.getMessage());
             }
         });
+    }
+
+    @DeleteMapping("/images/" + FILE_NAME)
+    public Mono<String> deleteImage(@PathVariable String filename) {
+        return imageService.deleteImage(filename)
+                .then(Mono.just("redirect:/"))
+                ;
     }
 }

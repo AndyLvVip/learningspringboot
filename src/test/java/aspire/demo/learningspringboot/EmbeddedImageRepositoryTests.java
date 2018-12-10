@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
@@ -59,6 +60,17 @@ public class EmbeddedImageRepositoryTests {
                 })
                 .expectComplete()
                 .verify();
+    }
+
+    @Test
+    public void findByNameShouldWork() {
+        Mono<Image> image = imageRepository.findByName("bazinga.png");
+        StepVerifier.create(image)
+                .expectNextMatches(results -> {
+                    assertThat(results.getName()).isEqualTo("bazinga.png");
+                    assertThat(results.getId()).isEqualTo("3");
+                    return true;
+                });
     }
 
 }

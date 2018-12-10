@@ -51,7 +51,7 @@ public class EmbeddedImageRepositoryTests {
                             .extracting(Image::getName)
                             .contains(
                                     "learning-spring-boot-cover.jpg",
-                                    "learning-spring-boot-2nd-edition.cover.jpg",
+                                    "learning-spring-boot-2nd-edition-cover.jpg",
                                     "bazinga.png"
                             )
                     ;

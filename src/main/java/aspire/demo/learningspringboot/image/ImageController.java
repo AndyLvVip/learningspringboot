@@ -30,6 +30,7 @@ public class ImageController {
     @GetMapping("/")
     public Mono<String> index(Model model) {
         model.addAttribute("images", imageService.findAllImages());
+        model.addAttribute("extra", "DevTools can also detect changes too");
         return Mono.just("index");
     }
 

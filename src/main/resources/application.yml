@@ -12,3 +12,9 @@ logging:
     reactor:
       core: trace
       util: trace
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

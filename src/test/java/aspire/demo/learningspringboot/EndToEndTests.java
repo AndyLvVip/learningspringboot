@@ -39,7 +39,7 @@ public class EndToEndTests {
 
     @BeforeClass
     public static void setup() throws IOException {
-        System.setProperty("webdriver.chrome.driver", "ext/chromedriver");
+        System.setProperty("webdriver.chrome.driver", "ext/chromedriver.exe");
 
         chromeDriverService = ChromeDriverService.createDefaultService();
         chromeDriver = new ChromeDriver(chromeDriverService);

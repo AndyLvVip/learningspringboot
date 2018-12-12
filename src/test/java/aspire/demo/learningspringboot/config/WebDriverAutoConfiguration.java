@@ -1,5 +1,6 @@
 package aspire.demo.learningspringboot.config;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -55,7 +56,10 @@ public class WebDriverAutoConfiguration {
         @Override
         public FirefoxDriver getObject() throws BeansException {
             if(properties.getFirefox().isEnabled()) {
-                System.setProperty("webdriver.gecko.driver", "ext/geckodriver.exe");
+                if(SystemUtils.IS_OS_WINDOWS)
+                    System.setProperty("webdriver.gecko.driver", "ext/geckodriver.exe");
+                else if(SystemUtils.IS_OS_LINUX)
+                    System.setProperty("webdriver.gecko.driver", "ext/geckodriver");
                 try {
                     return new FirefoxDriver();
                 }catch (Exception e) {
@@ -79,7 +83,10 @@ public class WebDriverAutoConfiguration {
         public ChromeDriver getObject() throws BeansException {
             if(properties.getChrome().isEnabled()) {
                 try {
-                    System.setProperty("webdriver.chrome.driver", "ext/chromedriver.exe");
+                    if(SystemUtils.IS_OS_WINDOWS)
+                        System.setProperty("webdriver.chrome.driver", "ext/chromedriver.exe");
+                    else if(SystemUtils.IS_OS_LINUX)
+                        System.setProperty("webdriver.chrome.driver", "ext/chromedriver");
                     return new ChromeDriver();
                 } catch (Exception e) {
                     e.printStackTrace();

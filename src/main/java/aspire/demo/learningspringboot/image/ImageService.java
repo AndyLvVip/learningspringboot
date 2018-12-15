@@ -1,5 +1,6 @@
 package aspire.demo.learningspringboot.image;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
@@ -30,9 +31,12 @@ public class ImageService {
 
     private final ResourceLoader resourceLoader;
 
-    public ImageService(ImageRepository imageRepository, ResourceLoader resourceLoader) {
+    private final MeterRegistry meterRegistry;
+
+    public ImageService(ImageRepository imageRepository, ResourceLoader resourceLoader, MeterRegistry meterRegistry) {
         this.imageRepository = imageRepository;
         this.resourceLoader = resourceLoader;
+        this.meterRegistry = meterRegistry;
     }
 
     public Flux<Image> findAllImages() {
@@ -73,7 +77,15 @@ public class ImageService {
                     .log("createImage-newfile")
                     .flatMap(destFile -> file.transferTo(destFile))
                     .log("createImage-copy");
-            return Mono.when(saveDatabaseImage, copyFile)
+
+                    Mono<Void> countFile = Mono.fromRunnable(() -> {
+                        meterRegistry
+                                .summary("files.uploaded.bytes")
+                                .record(Paths.get(UPLOAD_ROOT, file.filename())
+                                        .toFile().length());
+
+                    });
+            return Mono.when(saveDatabaseImage, copyFile, countFile)
                     .log("createImage-when")
                     ;
         }).then().log("createImage-done");

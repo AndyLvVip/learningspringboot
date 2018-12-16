@@ -1,13 +1,16 @@
 package aspire.demo.learningspringboot.comment;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import org.springframework.amqp.rabbit.annotation.Exchange;
-import org.springframework.amqp.rabbit.annotation.Queue;
-import org.springframework.amqp.rabbit.annotation.QueueBinding;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.Input;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
+@EnableBinding(CustomerProcessor.class)
 public class CommentService {
     private final CommentWriterRepository repository;
     private final MeterRegistry meterRegistry;
@@ -18,18 +21,17 @@ public class CommentService {
         this.meterRegistry = meterRegistry;
     }
 
-    @RabbitListener(
-            bindings = @QueueBinding(
-                    value = @Queue,
-                    exchange = @Exchange(value = "learning-spring-boot"),
-                    key = "comment.new"
-            )
-    )
-    public void save(Comment newComment) {
-        repository.save(newComment)
-                .log("commentService-save")
-                .subscribe(comment -> meterRegistry.counter("comment.consumed", "imageId", comment.getImageId())
-                        .increment()
-                );
+    @StreamListener
+    @Output(CustomerProcessor.OUTPUT)
+    public Flux<Void> save(@Input(CustomerProcessor.INPUT) Flux<Comment> comments) {
+        return repository.
+                saveAll(comments)
+                .flatMap(c -> {
+                    meterRegistry
+                            .counter("comment.consumed", "imageId", c.getImageId())
+                            .increment();
+                    return Mono.empty();
+                });
     }
+
 }

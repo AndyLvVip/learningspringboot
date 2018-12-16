@@ -30,3 +30,12 @@ spring:
   devtools:
     remote:
       secret: learningspringboot
+  cloud:
+    stream:
+      bindings:
+        input:
+          destination: learning-spring-boot-comment
+          group: learning-spring-boot
+        output:
+          destination: learning-spring-boot-comment
+          group: learning-spring-boot

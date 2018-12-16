@@ -1,9 +1,19 @@
 buildscript {
 	ext {
 		springBootVersion = '2.1.1.RELEASE'
+		springCloudVersion = 'Greenwich.RC1'
 	}
 	repositories {
 		mavenCentral()
+		maven {
+			url 'http://repo.spring.io/libs-release-local'
+		}
+		maven {
+			url 'http://repo.spring.io/libs-snapshot-local'
+		}
+		maven {
+			url 'http://repo.spring.io/libs-milestone-local'
+		}
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -12,7 +22,7 @@ buildscript {
 }
 
 plugins {
-	id "com.gorylenko.gradle-git-properties" version "1.5.2"
+	id "com.gorylenko.gradle-git-properties" version "1.4.17"
 }
 
 apply plugin: 'java'
@@ -27,6 +37,15 @@ sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
+    maven {
+        url 'http://repo.spring.io/libs-release-local'
+    }
+	maven {
+		url 'http://repo.spring.io/libs-snapshot-local'
+	}
+	maven {
+		url 'http://repo.spring.io/libs-milestone-local'
+	}
 }
 
 configurations {
@@ -43,7 +62,8 @@ dependencies {
 		exclude module: 'spring-boot-starter-reactor-netty'
 	}
 	implementation('org.springframework.boot:spring-boot-starter-tomcat')
-	implementation('org.springframework.boot:spring-boot-starter-amqp')
+	implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
+	implementation('org.springframework.cloud:spring-cloud-stream-reactive')
 	implementation('org.springframework.boot:spring-boot-configuration-processor')
 	implementation('org.springframework.boot:spring-boot-devtools')
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
@@ -59,4 +79,10 @@ dependencies {
 
 bootJar {
 	excludeDevtools = false
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }

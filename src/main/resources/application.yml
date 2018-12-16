@@ -7,7 +7,10 @@ logging:
       demo: debug
 
     org:
-      springframework: debug
+      springframework:
+        cloud: debug
+        amqp: debug
+        integration: debug
     reactor:
       core: trace
       util: trace

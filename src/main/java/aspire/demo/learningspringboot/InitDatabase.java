@@ -1,5 +1,7 @@
-package aspire.demo.learningspringboot.image;
+package aspire.demo.learningspringboot;
 
+import aspire.demo.learningspringboot.comment.Comment;
+import aspire.demo.learningspringboot.image.Image;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -15,7 +17,7 @@ import java.util.Arrays;
 public class InitDatabase {
 
     @Bean
-    public CommandLineRunner init(MongoOperations operations) {
+    public CommandLineRunner initImageCollection(MongoOperations operations) {
         return args -> {
             operations.dropCollection(Image.class);
             operations.insertAll(Arrays.asList(new Image("1", "learning-spring-boot-cover.jpg"),
@@ -24,5 +26,10 @@ public class InitDatabase {
             ));
             operations.findAll(Image.class).forEach(c -> System.out.println(c.toString()));
         };
+    }
+
+    @Bean
+    public CommandLineRunner initCommentCollection(MongoOperations operations) {
+        return args -> operations.dropCollection(Comment.class);
     }
 }

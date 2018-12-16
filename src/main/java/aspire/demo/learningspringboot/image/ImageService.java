@@ -45,7 +45,7 @@ public class ImageService {
     }
 
     @Bean
-    public CommandLineRunner setUp() {
+    public CommandLineRunner initFiles() {
         return args -> {
             FileSystemUtils.deleteRecursively(Paths.get(UPLOAD_ROOT));
             Files.createDirectory(Paths.get(UPLOAD_ROOT));

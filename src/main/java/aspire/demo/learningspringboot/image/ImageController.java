@@ -1,5 +1,6 @@
 package aspire.demo.learningspringboot.image;
 
+import aspire.demo.learningspringboot.comment.CommentReaderRepository;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * Created by andy.lv
@@ -23,13 +25,24 @@ public class ImageController {
 
     private ImageService imageService;
 
-    public ImageController(ImageService imageService) {
+    private CommentReaderRepository repository;
+
+    public ImageController(ImageService imageService, CommentReaderRepository repository) {
         this.imageService = imageService;
+        this.repository = repository;
     }
 
     @GetMapping("/")
     public Mono<String> index(Model model) {
-        model.addAttribute("images", imageService.findAllImages());
+        model.addAttribute("images", imageService.findAllImages()
+                .flatMap(image -> Mono.just(image)
+                        .zipWith(repository.findByImageId(image.getId()).collectList())
+                ).map(imageAndComment -> new HashMap() {{
+                    put("id", imageAndComment.getT1().getId());
+                    put("name", imageAndComment.getT1().getName());
+                    put("comments", imageAndComment.getT2());
+                }})
+        );
         model.addAttribute("extra", "DevTools can also detect changes too");
         return Mono.just("index");
     }
